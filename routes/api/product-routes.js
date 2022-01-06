@@ -55,10 +55,10 @@ router.get('/:id', async (req, res) => {
 // create new product
 router.post('/', async (req, res) => {
   try {
-    const product = await Product.create(req.body);
+    const productData = await Product.create(req.body);
     if (req.body.tagIds.length) {
-      await product.setTags(req.body.tagIds);
-      await product.save();
+      await productData.setTags(req.body.tagIds);
+      await productData.save();
     }
     res.status(200).json(product);
   } catch (err) {
@@ -130,7 +130,20 @@ router.put('/:id', (req, res) => {
 });
 
 router.delete('/:id', async (req, res) => {
-  // delete one product by its `id` value
+  try {
+    const productData = await Product.destroy({
+      where: {
+        id: req.params.id
+      }
+    })
+    if (!productData) {
+      res.status(404).json({ message: 'No such product' })
+    } else return res.json(productData);
+  }
+  catch (err) {
+    console.log(err);
+    res.status(500).json(err);
+  }
 });
 
 module.exports = router;
